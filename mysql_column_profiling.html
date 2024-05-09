@@ -80,17 +80,17 @@
     <div class="sider">
         <label for="ta_output">result</label>
         <textarea readonly id="ta_output"></textarea>
-        <button id="copytoclipboard">Copy text</button>
+        <button id="b_copy_to_clipboard">Copy Result</button>
     </div>
     <script>
         let tableName = document.getElementById("it_table_name");
         let input = document.getElementById("ta_column_name");
         let output = document.getElementById("ta_output");
-        let copytoclipboard = document.getElementById("copytoclipboard");
+        let copyToClipboard = document.getElementById("b_copy_to_clipboard");
 
         tableName.oninput = refresh;
         input.oninput = refresh;
-        copytoclipboard.onclick = copy;
+        copyToClipboard.onclick = copy;
 
         function refresh() {
             table = tableName.value;
