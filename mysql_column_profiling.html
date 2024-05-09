@@ -1,0 +1,191 @@
+<html>
+
+<head>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-size: 14;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sidel {
+            background-color: lightgray;
+            width: 20%;
+            height: 100%;
+            padding: 1em;
+            float: left;
+            box-sizing: border-box;
+        }
+
+        .sider {
+            background-color: white;
+            width: 80%;
+            height: 100%;
+            padding: 1em;
+            float: right;
+            box-sizing: border-box;
+        }
+
+        #it_table_name {
+            border: solid 1px;
+            width: 100%;
+        }
+
+        label {
+            line-height: 2em;
+        }
+
+        #ta_column_name {
+            border: solid 1px;
+            display: block;
+            width: 100%;
+            height: 90%;
+            resize: none;
+        }
+
+        #ta_output {
+            width: 100%;
+            height: 90%;
+            resize: none;
+        }
+
+        button {
+            color: white;
+            background-color: #008CBA;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            margin-left: 1em;
+            border: solid black 1px;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidel">
+            <label for="tablename">table name</label>
+            <input type="text" id="it_table_name"></textarea>
+            <label for="input">table columns</label>
+            <textarea id="ta_column_name"></textarea>
+    </div>
+    <div class="sider">
+        <label for="ta_output">result</label>
+        <textarea readonly id="ta_output"></textarea>
+        <button id="copytoclipboard">Copy text</button>
+    </div>
+    <script>
+        let tableName = document.getElementById("it_table_name");
+        let input = document.getElementById("ta_column_name");
+        let output = document.getElementById("ta_output");
+        let copytoclipboard = document.getElementById("copytoclipboard");
+
+        tableName.oninput = refresh;
+        input.oninput = refresh;
+        copytoclipboard.onclick = copy;
+
+        function refresh() {
+            table = tableName.value;
+            let query = "";
+            let columns = input.value.split(/\r?\n/);
+
+            query += "select\n";
+            query += "'null count' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `(COUNT(*)-COUNT(${row})) As '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+            
+            query += "UNION ALL\n"
+            
+            query += "select\n";
+            query += "'null ratio' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `(COUNT(*)-COUNT(${row}))/COUNT(*) As '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+
+            query += "UNION ALL\n"
+            
+            query += "select\n";
+            query += "'distinct count' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `COUNT(DISTINCT ${row}) AS '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+
+            query += "UNION ALL\n"
+            
+            query += "select\n";
+            query += "'duplicate values ratio' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `(1-(COUNT(DISTINCT ${row}))/COUNT(${row})) AS '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+            
+            query += "UNION ALL\n"
+            
+            query += "select\n";
+            query += "'min length' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `MIN(LENGTH(${row})) AS '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+            
+            query += "UNION ALL\n"
+            
+            query += "select\n";
+            query += "'max length' as 'report type',\n";
+            for (let index = 0; index < columns.length; index++) {
+                const row = columns[index];
+                query += `MAX(LENGTH(${row})) AS '${row}',`;
+                query += "\n";
+            }
+            query = query.slice(0, -2);
+            query += `\nfrom ${table}\n`;
+
+
+
+
+            output.value = query;
+        }
+        function copy() {
+            const copyContent = async () => {
+                try {
+                    await navigator.clipboard.writeText(output.value);
+                    console.log('Content copied to clipboard');
+                } catch (err) {
+                    console.log('Failed to copy: ', err);
+                }
+            }
+            copyContent();
+        }
+
+
+    </script>
+</body>
+
+</html>
