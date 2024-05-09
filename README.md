@@ -10,5 +10,8 @@ Enter table and column names then you have following information for eaech colum
 5. min length
 6. max length
 
+download [profiler](mysql_column_profiling.html) and open it with browser
+
+
 ## Useful Links
 + [Useful Data Profiling & Data Quality SQL Queries and Tool for SQL Server](https://dataedo.com/kb/query/sql-server/data-profiling-data-quality)
